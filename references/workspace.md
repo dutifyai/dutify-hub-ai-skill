@@ -8,30 +8,33 @@ GET /api/v1/workspaces
 
 Scope: `workspaces:read`.
 
-For an API-key caller, the response is filtered to **only the workspace this key is bound to** — even if the underlying user is a member of multiple workspaces. This is the simplest way to discover the bound workspace UUID from a stored key:
+For an API-key caller, the response is filtered to **only the workspace this key is bound to**. Even if the actor user is a member of multiple workspaces, only the bound one comes back. This is the simplest way to discover the bound workspace UUID from a stored key:
 
 ```python
 ws = requests.get(
     "https://dutify.ai/api/v1/workspaces",
     headers={"X-API-Key": key},
-).json()
+).json()["workspaces"]
 bound_uuid = ws[0]["id"]   # always exactly one entry for API-key callers
 ```
 
 For JWT callers (interactive Hub UI), the response includes every workspace the user belongs to.
 
-Each entry shape:
+Response shape (verified against prod):
 
 ```json
 {
-  "id": "00000000-0000-0000-0000-000000000000",
-  "name": "Acme Engineering",
-  "description": "Engineering team's workspace",
-  "isOwner": true,
-  "createdAt": "2026-01-01T00:00:00Z",
-  ...
+  "workspaces": [
+    {
+      "id": "00000000-0000-0000-0000-000000000000",
+      "name": "Acme Engineering",
+      "ownerId": "11111111-1111-1111-1111-111111111111"
+    }
+  ]
 }
 ```
+
+Wrapped in `{workspaces: [...]}` — not a bare array. Each entry has `id`, `name`, `ownerId`. Compare `ownerId` to the actor user UUID (e.g. from a separately-stored value) to derive whether the actor user owns the workspace.
 
 ## Create workspace — JWT only
 
@@ -51,24 +54,23 @@ GET /api/v1/workspaces/{workspaceId}/members
 
 Scope: `members:read`.
 
-Returns the full member directory:
+Returns the full member directory (verified shape against prod):
 
 ```json
 {
   "members": [
     {
-      "uuid": "<user-uuid>",
-      "email": "alex@dutify.ai",
+      "userId": "00000000-0000-0000-0000-000000000000",
       "firstName": "Alex",
       "lastName": "Smith",
-      "role": "OWNER",
-      "joinedAt": "2026-01-01T00:00:00Z",
-      ...
-    },
-    ...
+      "email": "alex@dutify.ai",
+      "role": "MEMBER"
+    }
   ]
 }
 ```
+
+Field is `userId`, not `uuid`. Roles seen: `OWNER`, `MEMBER`. No `joinedAt` / timestamp on this endpoint. Wrapped in `{members: [...]}` — not a bare array.
 
 Useful for:
 
@@ -102,7 +104,7 @@ def email_to_uuid(email: str) -> str | None:
     ).json()["members"]
     for m in members:
         if m["email"].lower() == email.lower():
-            return m["uuid"]
+            return m["userId"]   # field is userId, NOT uuid
     return None
 ```
 

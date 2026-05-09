@@ -143,7 +143,7 @@ If any step fails with a structured error body, read `code` and `message` (and `
 
 ## When to use the dutify-hub-mcp server instead
 
-The `dutify-hub-mcp` MCP server (https://hub-mcp.dutify.ai/mcp) wraps the same API surface as named MCP tools (`list_calls`, `lens_chat`, `set_default_workspace`, etc.). Use the MCP when:
+The `dutify-hub-mcp` MCP server (https://mcp-hub.dutify.ai/mcp) wraps the same API surface as named MCP tools (`list_calls`, `lens_chat`, `set_default_workspace`, etc.). Use the MCP when:
 
 - You're a host that speaks MCP and the user wired the server in (Claude Desktop, Claude Code with mcp_servers.json, etc.)
 - You want pre-baked argument schemas + per-tool descriptions

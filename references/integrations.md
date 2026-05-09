@@ -10,40 +10,29 @@ Read-only via API key. Connect / disconnect / OAuth flows are intentionally JWT-
 
 ## Response shape
 
-A list of `AuthorizedServiceDto`:
+A bare array of `AuthorizedServiceDto` — verified against prod, only two fields per entry:
 
 ```json
 [
-  {
-    "system": "JIRA",
-    "status": "CONNECTED",
-    "cloudId": "abc-123",
-    "lastSyncAt": "2026-05-09T18:00:00Z",
-    "metadata": { ... vendor-specific fields ... }
-  },
-  {
-    "system": "SLACK",
-    "status": "CONNECTED",
-    "teamId": "T091H4LUM6H",
-    "lastSyncAt": "...",
-    "metadata": { ... }
-  }
+  {"integrationSystem": "JIRA",     "status": "CONNECTED"},
+  {"integrationSystem": "CLICKUP",  "status": "CONNECTED"},
+  {"integrationSystem": "AIRTABLE", "status": "CONNECTED"},
+  {"integrationSystem": "PM",       "status": "ERROR"}
 ]
 ```
 
 Field-level rules:
 
-- **`system`** — IntegrationSystem enum value. Common: `JIRA`, `CLICKUP`, `AIRTABLE`, `SLACK`, `NOTION`, `GMAIL`, `GCAL`, `GITHUB`, `LINEAR`, `CONFLUENCE`, `ATLASSIAN`, `PM`. Pull the authoritative full list from the catalog (`Workspace Settings` tag → `IntegrationSystem` schema).
+- **`integrationSystem`** — IntegrationSystem enum value. Common: `JIRA`, `CLICKUP`, `AIRTABLE`, `SLACK`, `NOTION`, `GMAIL`, `GCAL`, `GITHUB`, `LINEAR`, `CONFLUENCE`, `ATLASSIAN`, `PM`. Pull the authoritative full list from the catalog (`Workspace Settings` tag → `IntegrationSystem` schema).
 - **`status`** — usually `CONNECTED`. Other values (`REVOKED`, `INITIATED`, `ERROR`) appear when the connection is in a bad state.
-- **Vendor-specific identifiers** — `cloudId` (Jira), `teamId` (Slack), `baseId` (Airtable), `composioConnectedAccount` (Composio toolkits) — these are what you pass to the call-action push endpoints (`POST /usercall/selection/jira` etc.).
 
-The exact field set varies per `system` because each vendor has different metadata. Treat the fields beyond `system` and `status` as optional and read them defensively.
+That's it. **Vendor-specific identifiers (`cloudId`, `selectedListId`, `baseId`, etc.) are NOT exposed via this endpoint** — Hub deliberately doesn't reveal them to API-key callers. To use a `send_to_jira/clickup/airtable` action you need those identifiers from the user (or from the vendor's own UI). The `list_integrations` endpoint only tells you which integrations exist + whether they're healthy; pushing actions requires the user to supply the cloudId / list-id / base-id explicitly.
 
 ## What this is for
 
 Two main use cases:
 
-### 1. Resolving the right `cloudId` / `selectedListId` / `baseId` for a "send to" call
+### 1. Pre-flight check before attempting a "send to" call
 
 ```python
 integrations = requests.get(
@@ -51,11 +40,11 @@ integrations = requests.get(
     headers={"X-API-Key": key},
 ).json()
 
-jira = next((i for i in integrations if i["system"] == "JIRA"), None)
-if jira is None:
+if not any(i["integrationSystem"] == "JIRA" and i["status"] == "CONNECTED" for i in integrations):
     raise RuntimeError("No Jira integration on this workspace — connect one in Hub UI.")
 
-# Now you have jira["cloudId"] for POST /usercall/selection/jira
+# Then ask the USER for the cloudId + projectIds and call:
+# POST /usercall/selection/jira  with  {callUUID, cloudId, projectIds}
 ```
 
 ### 2. Knowing what's available before suggesting a target
@@ -63,7 +52,7 @@ if jira is None:
 If the user says "send the action items somewhere", list integrations first and offer them the choice:
 
 ```python
-options = [i["system"] for i in integrations if i["status"] == "CONNECTED"]
+options = [i["integrationSystem"] for i in integrations if i["status"] == "CONNECTED"]
 print(f"Connected: {', '.join(options)}. Which do you want?")
 ```
 
@@ -84,7 +73,7 @@ def has_integration(system: str) -> bool:
         f"https://dutify.ai/api/v1/workspaces/{ws}/integrations",
         headers={"X-API-Key": key},
     ).json()
-    return any(i["system"] == system and i["status"] == "CONNECTED" for i in integrations)
+    return any(i["integrationSystem"] == system and i["status"] == "CONNECTED" for i in integrations)
 
 if not has_integration("JIRA"):
     print("Jira not connected — please connect via Hub UI then retry.")
@@ -104,10 +93,10 @@ integrations = requests.get(
     headers={"X-API-Key": key},
 ).json()
 
-if preferred and not any(i["system"] == preferred and i["status"] == "CONNECTED" for i in integrations):
+if preferred and not any(i["integrationSystem"] == preferred and i["status"] == "CONNECTED" for i in integrations):
     print(f"Workspace prefers {preferred} but it's not connected. The workspace settings are stale.")
 ```
 
-## Footgun: `system` is case-sensitive
+## Footgun: `integrationSystem` is case-sensitive
 
 The IntegrationSystem enum values are uppercase (`JIRA`, not `jira` or `Jira`). String comparison against the response field is byte-for-byte. If you're matching against user input, normalize with `.upper()` first.

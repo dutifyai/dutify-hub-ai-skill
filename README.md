@@ -69,7 +69,7 @@ Both wrap the same Hub API surface. Pick one:
 - **Skill (this) — direct HTTP** — best when writing scripts / one-shot automation outside an MCP-speaking host, when you want maximum control (custom retry, batching, custom auth flows), or when using less-common HTTP idioms (curl, `xh`, Postman).
 - **MCP** — best when you're a host that speaks MCP (Claude Desktop, Claude Code with `mcp_servers.json`) and the user wired the server in. Pre-baked tool schemas and per-tool descriptions; workspace-name resolution done for free.
 
-Both consume the same Hub backend. Both honour the same key + scope model. The MCP server lives at `https://hub-mcp.dutify.ai/mcp` (project source: [`mcp/dutify-hub-mcp`](../../mcp/dutify-hub-mcp)).
+Both consume the same Hub backend. Both honour the same key + scope model. The MCP server lives at `https://mcp-hub.dutify.ai/mcp` (project source: [`mcp/dutify-hub-mcp`](../../mcp/dutify-hub-mcp)).
 
 ## Contributing
 
