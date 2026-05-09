@@ -133,11 +133,12 @@ If the host language already has an HTTP idiom (Node `fetch`, `curl`, `axios`, `
 
 "Find action items from yesterday's Acme call and push them to Jira project ENG":
 
-1. `GET /api/usercall/search?query=Acme&page=0&size=10` → find the call. Pick the integer `id` of the most recent matching one. Pull its `uuid` field too.
-2. `GET /api/usercall/{id}` → confirm it's the right call, read `summary` / `actionItems` to verify there's something worth pushing.
-3. `GET /api/v1/workspaces/{wsId}/integrations` → confirm Jira is connected; pull the `cloudId` from the Jira entry.
-4. `POST /api/usercall/selection/jira` with body `{"callUUID": "<uuid>", "cloudId": "<from-step-3>", "projectIds": ["ENG"]}` (note: `projectIds` is an **array** of one or more Jira project ids, not a single string — the DTO is `Set<String>`).
-5. The response is a boolean indicating whether the apply succeeded. Surface to the user with the call name + count of action items pushed.
+1. `GET /api/v1/workspaces` → returns one entry; read `workspaces[0].id` for the bound workspace UUID.
+2. `GET /api/usercall/search?query=Acme&page=0&size=10` → find the call. Pick the **outer** integer `id` for follow-up gets, and the **nested** `call.callUuid` for the action push (yes, two different identifiers — see [calls.md](references/calls.md)).
+3. `GET /api/usercall/{id}` (outer id) → confirm it's the right call. Read `call.recordings[0].summary` and `call.recordings[0].actionItems` (markdown strings, not arrays) to verify there's something worth pushing.
+4. `GET /api/v1/workspaces/{wsId}/integrations` → confirm Jira is connected. **Note**: this endpoint only returns `{integrationSystem, status}` — the `cloudId` / `projectId` you need for the push is NOT here. The user has to supply it (from Jira's URL or out-of-band config).
+5. `POST /api/usercall/selection/jira` with body `{"callUUID": "<call.callUuid>", "cloudId": "<from user>", "projectIds": ["ENG"]}` (note: `projectIds` is an **array** of one or more Jira project ids, not a single string — the DTO is `Set<String>`).
+6. The response is `true` when Hub **accepts** the request, NOT when Jira receives it. To confirm landing, refetch the call and check that the top-level `jiraProjectId` field is populated.
 
 If any step fails with a structured error body, read `code` and `message` (and `validOptions` when present) — see [errors.md](references/errors.md) for the contract.
 
