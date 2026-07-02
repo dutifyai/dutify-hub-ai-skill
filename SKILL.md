@@ -1,5 +1,6 @@
 ---
 name: dutify-hub-api
+version: 2026.07.02
 description: Use the Dutify Hub HTTP API directly. Discover endpoints via the catalog at https://dutify.ai/api/v1/api-catalog, drill into a tag with /api-catalog/{tag} for full operation + schema detail, then call the endpoint with an X-API-Key header. Use this skill whenever the user wants to query, search, or act on Hub-side resources — call recordings, transcripts, summaries, signed audio/video URLs, workspace integrations, the workspace's custom AI prompt, the user's default workspace for events, sending call action items to Jira/ClickUp/Airtable, or asking Lens (programmatic chat) — even when they don't say "API" explicitly. Hub keys (dh_live_…) are NOT interchangeable with PM keys (dk_live_…); for PM/Wiki/Feature-Requests work, use the dutify-api skill instead.
 ---
 
@@ -8,6 +9,20 @@ description: Use the Dutify Hub HTTP API directly. Discover endpoints via the ca
 Direct HTTP access to **Dutify Hub** — workspace settings, integrations, members, call recordings + transcripts, the user's default workspace, and Lens chat — via the API-key surface (`dh_live_…`).
 
 This is the **second** of two Dutify HTTP skills. The other one — `dutify-api` — covers Project Management, Wiki, and Feature Requests with PM keys (`dk_live_…`). They're independent products with separate keys; pick whichever matches the data the user wants.
+
+## Staying current
+
+This skill wraps a fast-moving API — **make sure you're on the latest before you rely on it.**
+
+- **Version:** `2026.07.02` — also in the frontmatter `version` and the root [`VERSION`](VERSION) file. Format is CalVer `YYYY.MM.DD`, with an optional `.N` suffix for a second release the same day.
+- **Canonical source:** https://github.com/dutifyai/dutify-hub-ai-skill — the GitHub repo's `main` is the latest; this is the distribution copy.
+- **Check for a newer version before version-sensitive work:**
+  - *Git clone:* `git -C <skill-dir> pull --ff-only` — or `git fetch` then compare `git rev-parse HEAD` against `git ls-remote origin HEAD`.
+  - *Flat install (no git):* compare your local `VERSION` to the repo's, then re-pull/reinstall if it's newer —
+    ```
+    curl -s https://raw.githubusercontent.com/dutifyai/dutify-hub-ai-skill/main/VERSION
+    ```
+- **Maintainers:** on every change ("pump"), bump the frontmatter `version` **and** the `VERSION` file in the same commit. A second change the same day → add/increment the `.N` suffix.
 
 ## When to use this skill
 
