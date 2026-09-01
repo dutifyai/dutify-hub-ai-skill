@@ -21,13 +21,22 @@ The custom prompt is **system instructions prepended to every recording's LLM an
 GET /api/v1/workspaces/{workspaceId}/settings/custom-prompt
 ```
 
-Returns a JSON-encoded **string** (the prompt) or JSON `null` when none has been set. Both shapes are valid; check for null before using.
+Three shapes, all valid, none of them a 404:
+
+| Response | Means |
+|---|---|
+| JSON-encoded **string** | the prompt |
+| JSON `null` | never set |
+| **empty body** | set once and then cleared (`PUT` of an empty string) |
+
+`.json()` raises on that third one, so read the body first:
 
 ```python
-prompt = requests.get(
+r = requests.get(
     f"https://dutify.ai/api/v1/workspaces/{ws}/settings/custom-prompt",
     headers={"X-API-Key": key},
-).json()    # might be a string OR None
+)
+prompt = r.json() if r.text.strip() else None   # str | None, never an exception
 ```
 
 ### Write
@@ -144,5 +153,6 @@ JWT callers (interactive Hub UI users) can set the default to any workspace they
 - **Wrapping the body in an object for `set_custom_prompt`** — Hub takes a `@RequestBody String`, so `{"customPrompt": "..."}` is not rejected; the literal JSON text is stored *as the prompt* and prepended to every recording's analysis. Bare string only, and read the current value before overwriting it — there is no history.
 - **Reaching for `DELETE` to clear it** — there is no `DELETE` on this route (405). Clear it by `PUT`ing an empty string.
 - **Treating "no prompt set" as an error** — `GET .../custom-prompt` returning `null` is a valid state, not a 404. Default-empty.
+- **Calling `.json()` on the read unconditionally** — a prompt that has been *cleared* comes back as an empty body, not `null`, and `.json()` raises on it. Check `r.text` first.
 - **Trying to set defaultWorkspace to a different workspace's UUID** — always 403. Set to the bound workspace or null.
 - **PUT-ing `{workspaceId: ""}`** — empty string isn't a valid UUID, returns 400. Use `null` (JSON null) to clear.
