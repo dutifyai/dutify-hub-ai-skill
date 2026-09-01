@@ -141,7 +141,8 @@ JWT callers (interactive Hub UI users) can set the default to any workspace they
 
 ## Anti-patterns
 
-- **Wrapping the body in an object for `set_custom_prompt`** — Hub's `@RequestBody String` won't deserialize `{"customPrompt": "..."}`. Bare string only.
+- **Wrapping the body in an object for `set_custom_prompt`** — Hub takes a `@RequestBody String`, so `{"customPrompt": "..."}` is not rejected; the literal JSON text is stored *as the prompt* and prepended to every recording's analysis. Bare string only, and read the current value before overwriting it — there is no history.
+- **Reaching for `DELETE` to clear it** — there is no `DELETE` on this route (405). Clear it by `PUT`ing an empty string.
 - **Treating "no prompt set" as an error** — `GET .../custom-prompt` returning `null` is a valid state, not a 404. Default-empty.
 - **Trying to set defaultWorkspace to a different workspace's UUID** — always 403. Set to the bound workspace or null.
 - **PUT-ing `{workspaceId: ""}`** — empty string isn't a valid UUID, returns 400. Use `null` (JSON null) to clear.

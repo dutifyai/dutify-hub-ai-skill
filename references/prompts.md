@@ -14,9 +14,29 @@ silences the others.
 | Occurrence (one date) | `PUT`/`DELETE /api/v1/calendar/events/{eventId}/custom-prompt` | `recordings:write` |
 | Call (already recorded) | `PUT`/`DELETE /api/usercall/{id}/custom-prompt` | `recordings:write` |
 
-Body for the last three: `{"customPrompt": "…"}`. `DELETE` clears without a body.
-The workspace one is different — see the footgun in [settings.md](settings.md):
-it takes a **bare string**, not an object.
+Body for the last three: `{"customPrompt": "…"}`, and `DELETE` clears without a
+body.
+
+**The workspace one behaves differently in both directions and there is no
+`DELETE` on it:**
+
+```
+PUT /api/v1/workspaces/{workspaceId}/settings/custom-prompt
+Content-Type: text/plain
+
+Summarise in bullet points and flag budget risks.
+```
+
+- the body is a **bare string**, not `{"customPrompt": …}`
+- to **clear** it, `PUT` an **empty string** — `DELETE` on this route is a 405
+- `GET` returns JSON `null` when a prompt was never set, and an empty body after
+  one has been cleared. Both mean "no prompt configured" — neither is a 404
+
+Sending `{"customPrompt": "…"}` here does not fail. It is accepted and the
+literal text `{"customPrompt": "…"}` becomes the workspace prompt, which is then
+prepended to every recording's analysis until someone notices. **Read the current
+value before writing it** — there is no history, and the previous text is not
+recoverable through the API.
 
 ## Precedence
 
