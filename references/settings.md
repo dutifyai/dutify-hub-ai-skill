@@ -21,43 +21,74 @@ The custom prompt is **system instructions prepended to every recording's LLM an
 GET /api/v1/workspaces/{workspaceId}/settings/custom-prompt
 ```
 
-Returns a JSON-encoded **string** (the prompt) or JSON `null` when none has been set. Both shapes are valid; check for null before using.
+Returns the prompt as **plain text**. The class carries `@Produces("application/json")`, but the method returns a bare `String` and that is written verbatim — so a prompt of `Summarise in bullet points` comes back as those 26 characters, *not* as a quoted JSON string.
+
+Three shapes, all valid, none of them a 404:
+
+| Status | Body | Means |
+|---|---|---|
+| `200` | the prompt as text | set |
+| `200` | empty | set once, then cleared (`PUT` of an empty body) |
+| `204` | empty | never set — the service returns `null` and JAX-RS makes that a 204 |
 
 ```python
-prompt = requests.get(
+r = requests.get(
     f"https://dutify.ai/api/v1/workspaces/{ws}/settings/custom-prompt",
     headers={"X-API-Key": key},
-).json()    # might be a string OR None
+)
+prompt = r.text or None          # str | None
+# NOT r.json() — that raises unless the prompt happens to be valid JSON
 ```
 
 ### Write
 
 ```
 PUT /api/v1/workspaces/{workspaceId}/settings/custom-prompt
-Content-Type: application/json
+Content-Type: text/plain
 
-"Always summarize calls in the style of a sales executive..."
+Always summarize calls in the style of a sales executive...
 ```
 
-The body is a **bare JSON string** (with surrounding quotes) — NOT an object wrapping it. The frontend sends with `Content-Type: text/plain` (raw string, no quotes). Either works because the backend's `@RequestBody String` accepts both shapes; pick whichever your HTTP client makes natural.
+**The body is stored verbatim.** There is no `@Consumes` on the resource and the
+parameter is a plain `String`, so whatever bytes you send become the prompt —
+nothing is parsed, nothing is rejected, and there is no shape that fails.
 
-To clear the prompt, PUT a JSON `null` (4 chars literal) or a JSON empty string `""`.
+That makes every "encode it as JSON" instinct a way to corrupt the setting.
+Measured against the live endpoint:
+
+| Sent | Stored as the prompt |
+|---|---|
+| `Summarise in bullet points` | `Summarise in bullet points` ✔ |
+| `"Summarise in bullet points"` (JSON string) | the text **including both quote characters** |
+| `{"customPrompt": "..."}` | that literal JSON text |
+| `null` | the 4-character word `null` |
+| `""` | two quote characters |
+| *(empty body)* | cleared ✔ |
+
+So **the only way to clear it is an empty body** — not `null`, not `""`. Each of
+those stores itself and is then prepended to every recording's analysis.
 
 ```python
-# Set
+# Set — send raw bytes, never json=
 requests.put(
     f"https://dutify.ai/api/v1/workspaces/{ws}/settings/custom-prompt",
-    headers={"X-API-Key": key, "Content-Type": "application/json"},
-    json="Always summarize in third person and call out customer pain points.",   # bare string
+    headers={"X-API-Key": key, "Content-Type": "text/plain"},
+    data="Always summarize in third person and call out customer pain points.".encode(),
 )
 
-# Clear
+# Clear — an empty body
 requests.put(
     f"https://dutify.ai/api/v1/workspaces/{ws}/settings/custom-prompt",
-    headers={"X-API-Key": key, "Content-Type": "application/json"},
-    json=None,
+    headers={"X-API-Key": key, "Content-Type": "text/plain"},
+    data=b"",
 )
 ```
+
+`json=` in `requests` is the trap: `json="text"` sends `"text"` with quotes and
+`json=None` sends `null`, and both are stored literally.
+
+**Read the current value before writing.** This route has no history and no
+audit; an overwrite is unrecoverable through the API.
 
 Takes effect on the **next recording processed**. Existing recordings are not re-analysed automatically; trigger `/recording/{id}/regenerate-summary` to apply the new prompt to a specific recording (see [recordings.md](recordings.md)).
 
@@ -141,7 +172,10 @@ JWT callers (interactive Hub UI users) can set the default to any workspace they
 
 ## Anti-patterns
 
-- **Wrapping the body in an object for `set_custom_prompt`** — Hub's `@RequestBody String` won't deserialize `{"customPrompt": "..."}`. Bare string only.
-- **Treating "no prompt set" as an error** — `GET .../custom-prompt` returning `null` is a valid state, not a 404. Default-empty.
+- **Wrapping the body in an object for `set_custom_prompt`** — Hub takes a `@RequestBody String`, so `{"customPrompt": "..."}` is not rejected; the literal JSON text is stored *as the prompt* and prepended to every recording's analysis. Bare string only, and read the current value before overwriting it — there is no history.
+- **Reaching for `DELETE` to clear it** — there is no `DELETE` on this route (405). Clear it by `PUT`ing an empty **body**.
+- **Treating "no prompt set" as an error** — there are two empty states and neither is a failure: **204 No Content** when a prompt was never set, and **200 with an empty body** once one has been cleared. The literal token `null` is never returned, so do not compare against it.
+- **Clearing with `null` or `""`** — both are stored verbatim as the prompt. Only an empty body clears it.
+- **Calling `.json()` on the read at all** — the response is plain text, so `.json()` raises for any prompt that isn't itself valid JSON, and again on the empty body of a cleared prompt. Use `r.text`.
 - **Trying to set defaultWorkspace to a different workspace's UUID** — always 403. Set to the bound workspace or null.
 - **PUT-ing `{workspaceId: ""}`** — empty string isn't a valid UUID, returns 400. Use `null` (JSON null) to clear.
