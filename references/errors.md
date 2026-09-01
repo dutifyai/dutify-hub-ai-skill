@@ -65,7 +65,7 @@ A connection timeout (no response within 30s for non-Lens endpoints, 90s for Len
 
 These don't error — they return 2xx but with empty/null payloads:
 
-- `GET /v1/workspaces/{id}/settings/custom-prompt` returns the literal string `null` (JSON null, not the absence of a key) when no prompt has been set. Treat as "no prompt configured".
+- `GET /v1/workspaces/{id}/settings/custom-prompt` never emits the token `null`. Never set is **204 No Content**; cleared is **200 with an empty body**; set is **200 with the prompt as plain text**. All three mean "nothing went wrong" — see [prompts.md](prompts.md).
 - `GET /usercall/search?query=` with no matching results returns `[]`, not 404.
 - `GET /usercall/{id}` for a deleted call returns 404, not 200 with `{deleted: true}` — check status, not body.
 - `POST /usercall/selection/jira` returns the boolean `true` on success, `false` on a soft failure (e.g. integration tokens were valid at scope-check time but expired by the time the actual Jira API was called). Surface false to the user as "couldn't push" — don't treat it as success.

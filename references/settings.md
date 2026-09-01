@@ -21,22 +21,23 @@ The custom prompt is **system instructions prepended to every recording's LLM an
 GET /api/v1/workspaces/{workspaceId}/settings/custom-prompt
 ```
 
+Returns the prompt as **plain text**. The class carries `@Produces("application/json")`, but the method returns a bare `String` and that is written verbatim — so a prompt of `Summarise in bullet points` comes back as those 26 characters, *not* as a quoted JSON string.
+
 Three shapes, all valid, none of them a 404:
 
-| Response | Means |
-|---|---|
-| JSON-encoded **string** | the prompt |
-| JSON `null` | never set |
-| **empty body** | set once and then cleared (`PUT` of an empty string) |
-
-`.json()` raises on that third one, so read the body first:
+| Status | Body | Means |
+|---|---|---|
+| `200` | the prompt as text | set |
+| `200` | empty | set once, then cleared (`PUT` of an empty string) |
+| `204` | empty | never set — the service returns `null` and JAX-RS makes that a 204 |
 
 ```python
 r = requests.get(
     f"https://dutify.ai/api/v1/workspaces/{ws}/settings/custom-prompt",
     headers={"X-API-Key": key},
 )
-prompt = r.json() if r.text.strip() else None   # str | None, never an exception
+prompt = r.text or None          # str | None
+# NOT r.json() — that raises unless the prompt happens to be valid JSON
 ```
 
 ### Write
@@ -153,6 +154,6 @@ JWT callers (interactive Hub UI users) can set the default to any workspace they
 - **Wrapping the body in an object for `set_custom_prompt`** — Hub takes a `@RequestBody String`, so `{"customPrompt": "..."}` is not rejected; the literal JSON text is stored *as the prompt* and prepended to every recording's analysis. Bare string only, and read the current value before overwriting it — there is no history.
 - **Reaching for `DELETE` to clear it** — there is no `DELETE` on this route (405). Clear it by `PUT`ing an empty string.
 - **Treating "no prompt set" as an error** — `GET .../custom-prompt` returning `null` is a valid state, not a 404. Default-empty.
-- **Calling `.json()` on the read unconditionally** — a prompt that has been *cleared* comes back as an empty body, not `null`, and `.json()` raises on it. Check `r.text` first.
+- **Calling `.json()` on the read at all** — the response is plain text, so `.json()` raises for any prompt that isn't itself valid JSON, and again on the empty body of a cleared prompt. Use `r.text`.
 - **Trying to set defaultWorkspace to a different workspace's UUID** — always 403. Set to the bound workspace or null.
 - **PUT-ing `{workspaceId: ""}`** — empty string isn't a valid UUID, returns 400. Use `null` (JSON null) to clear.

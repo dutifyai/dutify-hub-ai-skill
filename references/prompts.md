@@ -29,8 +29,15 @@ Summarise in bullet points and flag budget risks.
 
 - the body is a **bare string**, not `{"customPrompt": …}`
 - to **clear** it, `PUT` an **empty string** — `DELETE` on this route is a 405
-- `GET` returns JSON `null` when a prompt was never set, and an empty body after
-  one has been cleared. Both mean "no prompt configured" — neither is a 404
+- `GET` returns the prompt as **plain text**, not JSON. The class says
+  `@Produces("application/json")` but the method returns a bare `String`, which
+  is written verbatim — `"Summarise in bullet points"` comes back as 26 bytes of
+  text, not a quoted JSON string. Read `r.text`; `.json()` raises on any prompt
+  that isn't itself valid JSON
+- three read shapes, none of them a 404: **200 + text** (set), **200 + empty
+  body** (set once, then cleared), **204 No Content** (never set — the service
+  returns Java `null` and JAX-RS turns that into a 204). The four-character
+  token `null` is never on the wire
 
 Sending `{"customPrompt": "…"}` here does not fail. It is accepted and the
 literal text `{"customPrompt": "…"}` becomes the workspace prompt, which is then
