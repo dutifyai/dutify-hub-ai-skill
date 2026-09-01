@@ -116,6 +116,25 @@ DELETE /api/usercall/{id}
 
 **Hard-deletes both the UserCall metadata AND the underlying recording media. Not reversible.** Returns `Response.ok(true)` on success. Confirm with the user before calling this — even when the user says "delete the call about X", consider listing first and showing them what will be deleted.
 
+### Set or clear this call's custom prompt
+
+```
+PUT    /api/usercall/{id}/custom-prompt     {"customPrompt": "Summarise as a decision log"}
+DELETE /api/usercall/{id}/custom-prompt
+```
+
+Extra instructions for the AI when it analyses this one call — the per-call
+equivalent of the workspace prompt, and the only way to attach a prompt to a
+meeting that never had a calendar event (ad-hoc desktop or bot recordings).
+Reads back as `callSpecificCustomPrompt` on the `UserCallDTO`.
+
+**Stored only.** It applies on the next processing run; it does not re-analyse
+anything by itself. Follow it with `POST /recording/{recordingId}/regenerate-summary`.
+
+Prompts from *every* participant's copy of the call are aggregated, so this adds
+your instruction rather than replacing someone else's. Full precedence rules and
+the calendar-level prompts are in [prompts.md](prompts.md).
+
 ### Send action items to Jira
 
 ```
