@@ -28,7 +28,8 @@ Summarise in bullet points and flag budget risks.
 ```
 
 - the body is a **bare string**, not `{"customPrompt": …}`
-- to **clear** it, `PUT` an **empty string** — `DELETE` on this route is a 405
+- to **clear** it, `PUT` an **empty body** — not `""` and not `null`, both of
+  which are stored verbatim as the prompt. `DELETE` on this route is a 405
 - `GET` returns the prompt as **plain text**, not JSON. The class says
   `@Produces("application/json")` but the method returns a bare `String`, which
   is written verbatim — `"Summarise in bullet points"` comes back as 26 bytes of

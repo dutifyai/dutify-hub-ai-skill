@@ -28,7 +28,7 @@ Three shapes, all valid, none of them a 404:
 | Status | Body | Means |
 |---|---|---|
 | `200` | the prompt as text | set |
-| `200` | empty | set once, then cleared (`PUT` of an empty string) |
+| `200` | empty | set once, then cleared (`PUT` of an empty body) |
 | `204` | empty | never set — the service returns `null` and JAX-RS makes that a 204 |
 
 ```python
@@ -173,8 +173,8 @@ JWT callers (interactive Hub UI users) can set the default to any workspace they
 ## Anti-patterns
 
 - **Wrapping the body in an object for `set_custom_prompt`** — Hub takes a `@RequestBody String`, so `{"customPrompt": "..."}` is not rejected; the literal JSON text is stored *as the prompt* and prepended to every recording's analysis. Bare string only, and read the current value before overwriting it — there is no history.
-- **Reaching for `DELETE` to clear it** — there is no `DELETE` on this route (405). Clear it by `PUT`ing an empty string.
-- **Treating "no prompt set" as an error** — `GET .../custom-prompt` returning `null` is a valid state, not a 404. Default-empty.
+- **Reaching for `DELETE` to clear it** — there is no `DELETE` on this route (405). Clear it by `PUT`ing an empty **body**.
+- **Treating "no prompt set" as an error** — there are two empty states and neither is a failure: **204 No Content** when a prompt was never set, and **200 with an empty body** once one has been cleared. The literal token `null` is never returned, so do not compare against it.
 - **Clearing with `null` or `""`** — both are stored verbatim as the prompt. Only an empty body clears it.
 - **Calling `.json()` on the read at all** — the response is plain text, so `.json()` raises for any prompt that isn't itself valid JSON, and again on the empty body of a cleared prompt. Use `r.text`.
 - **Trying to set defaultWorkspace to a different workspace's UUID** — always 403. Set to the bound workspace or null.
