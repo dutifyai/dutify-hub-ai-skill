@@ -31,6 +31,8 @@ Typical signals from the user:
 - "list my call recordings", "search calls about X"
 - "what's in the call from yesterday?" / "what action items came out of the Acme call?"
 - "set the workspace's custom prompt to X" / "what's our current Lens prompt?"
+- "set a custom prompt for tomorrow's standup" / "make every occurrence of this series summarise differently"
+- "re-summarise this call with different instructions"
 - "what integrations are connected to my workspace?"
 - "send the action items from this call to our Jira project"
 - "set my default workspace for events" / "where do new calendar events route?"
@@ -43,12 +45,13 @@ This SKILL.md covers the orientation. Each focused reference below is loaded on 
 
 | Reference | When to read |
 |---|---|
-| [auth.md](references/auth.md) | API-key header (`dh_live_…`), the 9 scopes, bound-workspace constraint, how to discover the bound workspace |
+| [auth.md](references/auth.md) | API-key header (`dh_live_…`), the 11 scopes, bound-workspace constraint, how to discover the bound workspace |
 | [errors.md](references/errors.md) | Hub error envelope shape, common codes (401/403/404/`WORKSPACE_OUT_OF_SCOPE`), what `validOptions` looks like when present |
 | [calls.md](references/calls.md) | `/usercall/...` — list, search, get, count, delete; integer ID vs UUID distinction; the `send_to_jira/clickup/airtable` "selection" endpoints with their per-vendor body shapes |
 | [recordings.md](references/recordings.md) | `/recording/...` — progress, reprocess, regenerate-summary, signed audio/media/preview URLs; expiry semantics; integer recording IDs |
 | [lens-chat.md](references/lens-chat.md) | `/lens/chat` — programmatic equivalent of Hub's Slack/Teams bot. The `ConversationalRagRequest` body, history shape, and the Hub-side short-circuit that lets API-key callers skip `tenantUuid`/`channelUuid` |
 | [settings.md](references/settings.md) | `/v1/workspaces/{id}/settings/...` (workspace-settings) AND `/user/settings/default-workspace` (per-user). The "API keys can only set defaultWorkspace to their bound workspace" constraint |
+| [prompts.md](references/prompts.md) | Custom prompts at all four levels — workspace, series, occurrence, call. Precedence, scopes, finding `eventId` / `seriesMasterId` via `/v1/calendar/events`, when each takes effect, per-participant aggregation |
 | [integrations.md](references/integrations.md) | `GET /v1/workspaces/{id}/integrations` — read-only listing of connected vendor toolkits (Slack, Jira, ClickUp, Airtable, Notion, Gmail, GCal, GitHub, ...). Why connect/OAuth flows are JWT-only |
 | [workspace.md](references/workspace.md) | `/v1/workspaces` listing (returns ONLY the bound workspace for API-key callers); `/v1/workspaces/{id}/members` |
 
@@ -81,6 +84,7 @@ The Hub catalog at `https://dutify.ai/api/v1/api-catalog` covers ONLY Hub. (PM/W
 | `Integrations` | `integrations:read` | List connected vendor toolkits |
 | `Recordings` | `recordings:read/write` | Recording progress, reprocess, regenerate summary, signed audio/media/preview URLs |
 | `Calls` | `recordings:read/write` | UserCall list/get/search/count/delete, send-to-Jira/ClickUp/Airtable |
+| `Calendar` | `calendar:read`, `recordings:write` | The caller's calendar events, and the per-occurrence / per-series custom prompt (proxied to calendar-events-api) |
 | `Lens` | `lens:chat` | Programmatic Lens chat (full pipeline against the workspace's knowledge) |
 | `Reference Data` | (public) | The catalog endpoints themselves |
 

@@ -17,7 +17,7 @@ Each key is bound to **exactly one workspace** at creation. Hub's `ApiKeyScopeFi
 
 `GET /api/v1/workspaces` from an API-key caller returns ONLY the bound workspace (other workspaces in the user's membership list are filtered out at the resource layer). To discover the bound workspace from a stored key, hit `GET /api/v1/workspaces` and read the `id` of the only entry returned.
 
-## Scope catalog (9 scopes)
+## Scope catalog (11 scopes)
 
 Scopes are granted at key creation; you cannot add scopes to an existing key. The filter maps the request path's "resource" segment to a scope prefix and the HTTP method to `:read` or `:write`.
 
@@ -31,7 +31,8 @@ Scopes are granted at key creation; you cannot add scopes to an existing key. Th
 | `user-settings:write` | `PUT /user/settings/default-workspace` — **with the constraint that the workspaceId in the body MUST match the key's bound workspace** (or be null to clear). 403 `WORKSPACE_OUT_OF_SCOPE` otherwise |
 | `integrations:read` | `GET /v1/workspaces/{id}/integrations` (list connected toolkits) |
 | `recordings:read` | `GET /usercall/all`, `/usercall/search`, `/usercall/{id}`, `/usercall/all/count`, `/usercall/search/count`; all `GET /recording/{id}/...` |
-| `recordings:write` | `POST /recording/{id}/reprocess`, `POST /recording/{id}/regenerate-summary`, `DELETE /usercall/{id}`, `POST /usercall/selection/{jira|clickup|airtable}`, `POST /usercall/fill` |
+| `recordings:write` | `POST /recording/{id}/reprocess`, `POST /recording/{id}/regenerate-summary`, `DELETE /usercall/{id}`, `POST /usercall/selection/{jira|clickup|airtable}`, `POST /usercall/fill`; the custom-prompt writes — `PUT`/`DELETE` on `/v1/calendar/events/{eventId}/custom-prompt`, `/v1/calendar/series/{seriesMasterId}/custom-prompt` and `/usercall/{id}/custom-prompt` (see [prompts.md](prompts.md)) |
+| `calendar:read` | `GET /v1/calendar/events` (the actor's calendar events, with any prompts already set) |
 | `lens:chat` | `POST /lens/chat` (exact path only — `/lens/chat/stream`, `/lens/chat/anything-else`, `/v1/lens/...` are denied) |
 
 ## What's NOT exposed to API keys

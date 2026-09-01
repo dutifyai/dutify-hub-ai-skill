@@ -11,6 +11,8 @@ Workspace settings affect every user of the workspace. User settings affect only
 
 ## Workspace setting: custom prompt
 
+The custom prompt here is the **workspace-wide** one — the least specific of four levels. A single meeting, a recurring series, and an individual call can each carry their own; see [prompts.md](prompts.md) for the precedence (the workspace prompt applies *in addition* to those, not instead of them).
+
 The custom prompt is **system instructions prepended to every recording's LLM analysis** — the workspace's "house style" for summaries, key points, and action items. Setting it well is one of the headline use cases for an API key (a sync script can keep the prompt locked to an external source of truth).
 
 ### Read

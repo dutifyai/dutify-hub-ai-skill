@@ -33,19 +33,20 @@ After install:
 
 ```bash
 ls ~/.claude/skills/dutify-hub-api/SKILL.md         # should exist
-ls ~/.claude/skills/dutify-hub-api/references/      # 7 topic files
+ls ~/.claude/skills/dutify-hub-api/references/      # 9 topic files
 ```
 
 Then in any Claude Code session, ask "what's the URL for downloading the audio of a Dutify recording?" — Claude should pick up the skill, load `references/recordings.md`, and answer.
 
 ## How the skill is laid out
 
-`SKILL.md` is the orientation file an LLM always sees; the 7 reference files in `references/` are loaded on-demand based on the topic map.
+`SKILL.md` is the orientation file an LLM always sees; the 9 reference files in `references/` are loaded on-demand based on the topic map.
 
 | File | Topic |
 |---|---|
 | `SKILL.md` | Orientation: discover→call flow, MCP-vs-skill choice, lite-vs-non-lite (n/a — Hub doesn't split), pagination, calling pattern, worked example |
-| `references/auth.md` | API-key header, the 9 scopes, bound-workspace constraint, what's NOT exposed to API keys, error responses for auth failures |
+| `references/auth.md` | API-key header, the 11 scopes, bound-workspace constraint, what's NOT exposed to API keys, error responses for auth failures |
+| `references/prompts.md` | Custom prompts at all four levels — workspace, series, occurrence, call; precedence, scopes, finding the ids, when each takes effect |
 | `references/errors.md` | Hub error envelope shape, status code vocabulary, error code vocabulary (`WORKSPACE_OUT_OF_SCOPE` etc.), silent-failure modes |
 | `references/calls.md` | UserCalls — list, search, get, count, delete; integer ID vs UUID distinction; send-to-Jira/ClickUp/Airtable per-vendor body shapes |
 | `references/recordings.md` | `/recording/...` — progress, reprocess, regenerate-summary, signed audio/media/preview URLs; expiry semantics |
@@ -56,7 +57,7 @@ Then in any Claude Code session, ask "what's the URL for downloading the audio o
 
 ## Authentication
 
-Every Hub data-access call needs `X-API-Key: dh_live_<rest>`. Generate keys via the Hub UI under workspace settings → API Keys. One key is bound to one workspace; the scope filter rejects path-workspace mismatches with `403`. See `references/auth.md` for the full scope vocabulary (9 scopes).
+Every Hub data-access call needs `X-API-Key: dh_live_<rest>`. Generate keys via the Hub UI under workspace settings → API Keys. One key is bound to one workspace; the scope filter rejects path-workspace mismatches with `403`. See `references/auth.md` for the full scope vocabulary (11 scopes).
 
 ## Why a topic-indexed skill rather than one long doc
 
