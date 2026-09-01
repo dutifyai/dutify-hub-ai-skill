@@ -45,7 +45,7 @@ This SKILL.md covers the orientation. Each focused reference below is loaded on 
 
 | Reference | When to read |
 |---|---|
-| [auth.md](references/auth.md) | API-key header (`dh_live_…`), the 10 scopes, bound-workspace constraint, how to discover the bound workspace |
+| [auth.md](references/auth.md) | API-key header (`dh_live_…`), the 11 scopes, bound-workspace constraint, how to discover the bound workspace |
 | [errors.md](references/errors.md) | Hub error envelope shape, common codes (401/403/404/`WORKSPACE_OUT_OF_SCOPE`), what `validOptions` looks like when present |
 | [calls.md](references/calls.md) | `/usercall/...` — list, search, get, count, delete; integer ID vs UUID distinction; the `send_to_jira/clickup/airtable` "selection" endpoints with their per-vendor body shapes |
 | [recordings.md](references/recordings.md) | `/recording/...` — progress, reprocess, regenerate-summary, signed audio/media/preview URLs; expiry semantics; integer recording IDs |

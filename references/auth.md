@@ -17,7 +17,7 @@ Each key is bound to **exactly one workspace** at creation. Hub's `ApiKeyScopeFi
 
 `GET /api/v1/workspaces` from an API-key caller returns ONLY the bound workspace (other workspaces in the user's membership list are filtered out at the resource layer). To discover the bound workspace from a stored key, hit `GET /api/v1/workspaces` and read the `id` of the only entry returned.
 
-## Scope catalog (10 scopes)
+## Scope catalog (11 scopes)
 
 Scopes are granted at key creation; you cannot add scopes to an existing key. The filter maps the request path's "resource" segment to a scope prefix and the HTTP method to `:read` or `:write`.
 
