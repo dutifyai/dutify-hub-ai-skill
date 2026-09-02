@@ -71,7 +71,10 @@ no conflict, and clearing it deletes instructions every other occurrence relies 
 The **workspace** prompt is the third input of the same set: a participant's version
 of the summary, key points, action items and enhanced notes is generated from
 their workspace prompt + their call-specific prompt (the series/occurrence text
-above, or whatever they set on the call) + their own notes from the desktop app.
+above, or whatever they set on the call) + their own notes from the desktop app
++ the note template those notes were taken with (general, one_on_one, interview,
+sales, standup). Changing any of the four — the template included — moves you to
+a different version on your next regenerate.
 Nothing is aggregated across participants: two attendees with identical inputs
 share one generated version, an attendee with none of them gets the default
 version, and no attendee's prompt or notes ever shapes — or is visible in —
