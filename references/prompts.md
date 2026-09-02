@@ -1,9 +1,9 @@
 # Custom prompts — workspace, series, occurrence, call
 
 A custom prompt is extra instruction text handed to the LLM when it analyses a
-meeting. There are four places to set one. They are **not** a single override
-chain — read the precedence rules below before assuming the most specific one
-silences the others.
+meeting. There are four places to set one. They are **not** an override chain
+at all — every level that is set is applied. Read the combination rules below
+before assuming the most specific one silences the others.
 
 ## The four levels
 
@@ -46,11 +46,27 @@ prepended to every recording's analysis until someone notices. **Read the curren
 value before writing it** — there is no history, and the previous text is not
 recoverable through the API.
 
-## Precedence
+## How the levels combine
 
-At bot-launch the calendar side resolves **occurrence → series**: an event's own
-prompt wins, and only if it has none does the series prompt apply. The winner is
-copied onto the resulting call as its call-specific prompt.
+Nothing overrides anything. At bot-launch the calendar side reads the occurrence's
+own prompt **and** its series prompt, and applies **both**:
+
+- both set → the call receives them together, labelled:
+
+  ```
+  series custom prompt: <series prompt>
+
+  occurrence custom prompt: <occurrence prompt>
+  ```
+
+- only one set → that one, as-is, without a label
+- neither → no call-specific prompt
+
+The result is copied onto the resulting call as its call-specific prompt. Clearing
+an occurrence prompt therefore never "falls back" to anything — the series prompt
+was already applying; you have only removed the date-specific part. Never advise
+clearing a series prompt to "avoid a conflict" with an occurrence prompt: there is
+no conflict, and clearing it deletes instructions every other occurrence relies on.
 
 The **workspace** prompt applies to every meeting *in addition* to whatever
 call-specific prompt exists. It is not overridden by the more specific levels —
@@ -151,5 +167,5 @@ available.
 - **Assuming the most specific prompt is the only one applied.** The workspace
   prompt is always in play as well.
 - **Calling `/v1/calendar/events` without both dates.** 400, not an empty list.
-- **Expecting a series prompt to reach occurrences that carry their own.** An
-  occurrence-level prompt wins for that date.
+- **Assuming an occurrence prompt replaces the series prompt for that date.** It
+  does not — both are applied, labelled, in one call-specific prompt.

@@ -51,7 +51,7 @@ This SKILL.md covers the orientation. Each focused reference below is loaded on 
 | [recordings.md](references/recordings.md) | `/recording/...` — progress, reprocess, regenerate-summary, signed audio/media/preview URLs; expiry semantics; integer recording IDs |
 | [lens-chat.md](references/lens-chat.md) | `/lens/chat` — programmatic equivalent of Hub's Slack/Teams bot. The `ConversationalRagRequest` body, history shape, and the Hub-side short-circuit that lets API-key callers skip `tenantUuid`/`channelUuid` |
 | [settings.md](references/settings.md) | `/v1/workspaces/{id}/settings/...` (workspace-settings) AND `/user/settings/default-workspace` (per-user). The "API keys can only set defaultWorkspace to their bound workspace" constraint |
-| [prompts.md](references/prompts.md) | Custom prompts at all four levels — workspace, series, occurrence, call. Precedence, scopes, finding `eventId` / `seriesMasterId` via `/v1/calendar/events`, when each takes effect, per-participant aggregation |
+| [prompts.md](references/prompts.md) | Custom prompts at all four levels — workspace, series, occurrence, call. How the levels combine (series + occurrence BOTH apply), scopes, finding `eventId` / `seriesMasterId` via `/v1/calendar/events`, when each takes effect, per-participant aggregation |
 | [integrations.md](references/integrations.md) | `GET /v1/workspaces/{id}/integrations` — read-only listing of connected vendor toolkits (Slack, Jira, ClickUp, Airtable, Notion, Gmail, GCal, GitHub, ...). Why connect/OAuth flows are JWT-only |
 | [workspace.md](references/workspace.md) | `/v1/workspaces` listing (returns ONLY the bound workspace for API-key callers); `/v1/workspaces/{id}/members` |
 
