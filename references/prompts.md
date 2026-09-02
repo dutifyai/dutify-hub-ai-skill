@@ -1,9 +1,9 @@
 # Custom prompts — workspace, series, occurrence, call
 
 A custom prompt is extra instruction text handed to the LLM when it analyses a
-meeting. There are four places to set one. They are **not** a single override
-chain — read the precedence rules below before assuming the most specific one
-silences the others.
+meeting. There are four places to set one. They are **not** an override chain
+at all — every level that is set is applied. Read the combination rules below
+before assuming the most specific one silences the others.
 
 ## The four levels
 
@@ -46,20 +46,45 @@ prepended to every recording's analysis until someone notices. **Read the curren
 value before writing it** — there is no history, and the previous text is not
 recoverable through the API.
 
-## Precedence
+## How the levels combine
 
-At bot-launch the calendar side resolves **occurrence → series**: an event's own
-prompt wins, and only if it has none does the series prompt apply. The winner is
-copied onto the resulting call as its call-specific prompt.
+Nothing overrides anything. At bot-launch the calendar side reads the occurrence's
+own prompt **and** its series prompt, and applies **both**:
 
-The **workspace** prompt applies to every meeting *in addition* to whatever
-call-specific prompt exists. It is not overridden by the more specific levels —
-think "always-on house style" plus "instructions for this meeting".
+- both set → the call receives them together, labelled:
 
-Call-specific prompts **aggregate across participants**: if three attendees each
-set a different prompt on their own copy of the same call, the analysis receives
-all three distinct prompts. Setting yours adds your voice; it does not silence
-anyone else's.
+  ```
+  series custom prompt: <series prompt>
+
+  occurrence custom prompt: <occurrence prompt>
+  ```
+
+- only one set → that one, as-is, without a label
+- neither → no call-specific prompt
+
+The result is copied onto the resulting call as its call-specific prompt. Clearing
+an occurrence prompt therefore never "falls back" to anything — the series prompt
+was already applying; you have only removed the date-specific part. Never advise
+clearing a series prompt to "avoid a conflict" with an occurrence prompt: there is
+no conflict, and clearing it deletes instructions every other occurrence relies on.
+
+The **workspace** prompt is the third input of the same set: a participant's version
+of the summary, key points, action items and enhanced notes is generated from
+their workspace prompt + their call-specific prompt (the series/occurrence text
+above, or whatever they set on the call) + their own notes from the desktop app
++ the note template those notes were taken with (general, one_on_one, interview,
+sales, standup). Changing any of the four — the template included — moves you to
+a different version on your next regenerate.
+Nothing is aggregated across participants: two attendees with identical inputs
+share one generated version, an attendee with none of them gets the default
+version, and no attendee's prompt or notes ever shapes — or is visible in —
+another attendee's version. A participant with only a workspace prompt is
+therefore affected by the workspace prompt alone.
+
+`GET /usercall/{id}` returns the caller's version in `recordings[0].summary`,
+`keyPoints`, `actionItems`, `enhancedNotes`, and only the caller's `userNotes`.
+`POST /recording/{id}/regenerate-summary` regenerates the caller's version from
+their CURRENT inputs and touches nobody else's.
 
 ## Finding the ids
 
@@ -148,8 +173,9 @@ available.
   bare string; the three newer endpoints take `{"customPrompt": …}`. They differ.
 - **Expecting a per-call prompt to re-analyse the call.** It does not. Follow it
   with `regenerate-summary`.
-- **Assuming the most specific prompt is the only one applied.** The workspace
-  prompt is always in play as well.
+- **Assuming another participant's prompt changes what you see.** It does not:
+  versions are per instruction set, and a call prompt only ever reaches the
+  version of the user who set it.
 - **Calling `/v1/calendar/events` without both dates.** 400, not an empty list.
-- **Expecting a series prompt to reach occurrences that carry their own.** An
-  occurrence-level prompt wins for that date.
+- **Assuming an occurrence prompt replaces the series prompt for that date.** It
+  does not — both are applied, labelled, in one call-specific prompt.
