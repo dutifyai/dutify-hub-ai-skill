@@ -68,14 +68,20 @@ was already applying; you have only removed the date-specific part. Never advise
 clearing a series prompt to "avoid a conflict" with an occurrence prompt: there is
 no conflict, and clearing it deletes instructions every other occurrence relies on.
 
-The **workspace** prompt applies to every meeting *in addition* to whatever
-call-specific prompt exists. It is not overridden by the more specific levels —
-think "always-on house style" plus "instructions for this meeting".
+The **workspace** prompt is the third input of the same set: a participant's version
+of the summary, key points, action items and enhanced notes is generated from
+their workspace prompt + their call-specific prompt (the series/occurrence text
+above, or whatever they set on the call) + their own notes from the desktop app.
+Nothing is aggregated across participants: two attendees with identical inputs
+share one generated version, an attendee with none of them gets the default
+version, and no attendee's prompt or notes ever shapes — or is visible in —
+another attendee's version. A participant with only a workspace prompt is
+therefore affected by the workspace prompt alone.
 
-Call-specific prompts **aggregate across participants**: if three attendees each
-set a different prompt on their own copy of the same call, the analysis receives
-all three distinct prompts. Setting yours adds your voice; it does not silence
-anyone else's.
+`GET /usercall/{id}` returns the caller's version in `recordings[0].summary`,
+`keyPoints`, `actionItems`, `enhancedNotes`, and only the caller's `userNotes`.
+`POST /recording/{id}/regenerate-summary` regenerates the caller's version from
+their CURRENT inputs and touches nobody else's.
 
 ## Finding the ids
 
@@ -164,8 +170,9 @@ available.
   bare string; the three newer endpoints take `{"customPrompt": …}`. They differ.
 - **Expecting a per-call prompt to re-analyse the call.** It does not. Follow it
   with `regenerate-summary`.
-- **Assuming the most specific prompt is the only one applied.** The workspace
-  prompt is always in play as well.
+- **Assuming another participant's prompt changes what you see.** It does not:
+  versions are per instruction set, and a call prompt only ever reaches the
+  version of the user who set it.
 - **Calling `/v1/calendar/events` without both dates.** 400, not an empty list.
 - **Assuming an occurrence prompt replaces the series prompt for that date.** It
   does not — both are applied, labelled, in one call-specific prompt.
