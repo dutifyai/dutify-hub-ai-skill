@@ -57,7 +57,7 @@ Then in any Claude Code session, ask "what's the URL for downloading the audio o
 
 ## Authentication
 
-Every Hub data-access call needs `X-API-Key: dh_live_<rest>`. Generate keys via the Hub UI under workspace settings → API Keys. One key is bound to one workspace; the scope filter rejects path-workspace mismatches with `403`. See `references/auth.md` for the full scope vocabulary (11 scopes).
+Every data-access call needs `X-API-Key` with a `dh_live_…` workspace key or a `du_live_…` account personal key. Create workspace keys in workspace settings and personal keys in account settings. Workspace keys retain their fixed binding; personal keys discover allowed workspaces and select one per call with `X-Dutify-Workspace`. See [authentication](references/auth.md) and [personal keys](references/personal-keys.md) for scopes and denial codes.
 
 ## Why a topic-indexed skill rather than one long doc
 

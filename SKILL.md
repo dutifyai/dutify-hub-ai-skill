@@ -1,6 +1,6 @@
 ---
 name: dutify-hub-api
-version: 2026.09.23
+version: 2026.09.24
 description: Use the Dutify Hub HTTP API directly. Discover endpoints via the catalog at https://dutify.ai/api/v1/api-catalog, drill into a tag with /api-catalog/{tag} for full operation + schema detail, then call the endpoint with an X-API-Key header. Use this skill whenever the user wants to query, search, or act on Hub-side resources — call recordings, transcripts, summaries, signed audio/video URLs, workspace integrations, the workspace's custom AI prompt, the user's default workspace for events, sending call action items to Jira/ClickUp/Airtable, or asking Lens (programmatic chat) — even when they don't say "API" explicitly. Workspace Hub keys (dh_live_…) and suite keys (dk_live_…) are product-specific; account personal keys (du_live_…) work with both. For PM/Wiki/Feature-Requests work, use the dutify-api skill instead.
 ---
 
@@ -14,7 +14,7 @@ This is the **second** of two Dutify HTTP skills. The other one — `dutify-api`
 
 This skill wraps a fast-moving API — **make sure you're on the latest before you rely on it.**
 
-- **Version:** `2026.09.23` — also in the frontmatter `version` and the root [`VERSION`](VERSION) file. Format is CalVer `YYYY.MM.DD`, with an optional `.N` suffix for a second release the same day.
+- **Version:** `2026.09.24` — also in the frontmatter `version` and the root [`VERSION`](VERSION) file. Format is CalVer `YYYY.MM.DD`, with an optional `.N` suffix for a second release the same day.
 - **Canonical source:** https://github.com/dutifyai/dutify-hub-ai-skill — the GitHub repo's `main` is the latest; this is the distribution copy.
 - **Check for a newer version before version-sensitive work:**
   - *Git clone:* `git -C <skill-dir> pull --ff-only` — or `git fetch` then compare `git rev-parse HEAD` against `git ls-remote origin HEAD`.

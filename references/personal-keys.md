@@ -24,3 +24,7 @@ PM workspace Security settings include **Allow personal API keys**, enabled by d
 A personal key consumes one remaining slot in the workspace's API-key count on first successful use, shared across products. Workspace keys have priority; remaining personal slots follow first-use order. A limit denial (`PERSONAL_API_KEY_LIMIT_REACHED`, 402) suggests upgrading the workspace or disabling personal-key access in Security settings. A 403 policy/access denial (`PERSONAL_API_KEYS_DISABLED` from PM or `PERSONAL_API_KEY_ACCESS_DENIED` from downstream services) requires checking the workspace policy, current membership, product access, and key scopes. Missing selection is 400. Do not retry these failures by switching workspaces or credentials without user direction.
 
 The server can revoke access at any time. Re-discover as needed; never retain positive authorization decisions across requests. Keep discovery separate from data calls so an unavailable configured default does not prevent selecting another allowed workspace.
+
+Keys created by a personal key inherit an expiry no later than their parent's. An omitted child expiry uses the parent's expiry; a later explicit expiry is rejected. Revoking a parent revokes its descendants. Key-management scopes remain in the full-permission default; read-only keys may list key metadata with `account:api-keys:read` but cannot mint or revoke keys.
+
+Calendar personal-key requests include the owner's unassigned events alongside events in the selected workspace. Events assigned to other workspaces remain inaccessible.
