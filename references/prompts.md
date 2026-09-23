@@ -138,9 +138,10 @@ PUT /api/v1/calendar/series/{seriesMasterId}/custom-prompt
 {"customPrompt": "Track blockers", "workspaceId": "…"}
 ```
 
-`workspaceId` is optional and only consulted when the row must be created. It may
-be either the key's bound workspace or the actor's own default — **either one,
-even when they differ**. Any other workspace is refused with 403.
+`workspaceId` is optional and only consulted when the row must be created. It
+provides processing context, not ownership. Personal keys may choose that context
+for any of the user's own series. Workspace keys remain restricted to their bound
+workspace or the actor's own default; any other choice is refused with 403.
 
 Two cases still answer 404: a series with no synced occurrences, and one where
 neither a key workspace nor a default workspace resolves — a row with no workspace

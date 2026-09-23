@@ -6,9 +6,9 @@ description: Use the Dutify Hub HTTP API directly. Discover endpoints via the ca
 
 # Dutify Hub API
 
-Direct HTTP access to **Dutify Hub** — workspace settings, integrations, members, call recordings + transcripts, the user's default workspace, and Lens chat — via the API-key surface (`dh_live_…`).
+Direct HTTP access to **Dutify Hub** — workspace settings, integrations, members, call recordings + transcripts, the user's default workspace, and Lens chat — via workspace keys (`dh_live_…`) or shared account personal keys (`du_live_…`).
 
-This is the **second** of two Dutify HTTP skills. The other one — `dutify-api` — covers Project Management, Wiki, and Feature Requests with PM keys (`dk_live_…`). They're independent products with separate keys; pick whichever matches the data the user wants.
+This is the **second** of two Dutify HTTP skills. The other one — `dutify-api` — covers Project Management, Wiki, and Feature Requests with PM keys (`dk_live_…`). Workspace keys are product-specific; one account personal key (`du_live_…`) works with both. Pick the skill matching the requested resources.
 
 ## Staying current
 
@@ -45,7 +45,7 @@ This SKILL.md covers the orientation. Each focused reference below is loaded on 
 
 | Reference | When to read |
 |---|---|
-| [auth.md](references/auth.md) | API-key header (`dh_live_…`), the 11 scopes, bound-workspace constraint, how to discover the bound workspace |
+| [auth.md](references/auth.md) | API-key headers, scopes, workspace boundaries, and discovery |
 | [errors.md](references/errors.md) | Hub error envelope shape, common codes (401/403/404/`WORKSPACE_OUT_OF_SCOPE`), what `validOptions` looks like when present |
 | [calls.md](references/calls.md) | `/usercall/...` — list, search, get, count, delete; integer ID vs UUID distinction; the `send_to_jira/clickup/airtable` "selection" endpoints with their per-vendor body shapes |
 | [recordings.md](references/recordings.md) | `/recording/...` — progress, reprocess, regenerate-summary, signed audio/media/preview URLs; expiry semantics; integer recording IDs |

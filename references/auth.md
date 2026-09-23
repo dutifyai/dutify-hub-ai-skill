@@ -2,7 +2,7 @@
 
 ## Account personal keys
 
-`du_live_…` keys work across Hub and the suite. Create/manage them in account settings. Discover workspaces and select one per request using `X-Dutify-Workspace`; see [personal-keys.md](personal-keys.md). The workspace-binding rules below describe existing `dh_live_…` workspace keys. For personal keys, the same boundary applies to the workspace selected for this request.
+`du_live_…` keys work across Hub and the suite. Create/manage them in account settings. Discover workspaces and select one per request using `X-Dutify-Workspace`; see [personal-keys.md](personal-keys.md). The workspace-binding rules below describe existing `dh_live_…` workspace keys. For personal keys, workspace resources follow the workspace selected for this request. Calendar events remain account-owned across processing-workspace assignments; see [prompts.md](prompts.md).
 
 
 Every Hub data-access call needs `X-API-Key` with either a `dh_live_…` workspace key or a `du_live_…` account personal key. Workspace keys are issued from Hub workspace settings → **API Keys**; personal keys from account settings.

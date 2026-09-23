@@ -6,7 +6,7 @@ Covers the Hub API surface in one skill: workspace settings, integrations, membe
 
 This is the **second** of two Dutify HTTP skills:
 
-- [`dutify-api`](../dutify-api) — Project Management, Wiki, Feature Requests. PM API keys (`dk_live_…`).
+- [`dutify-api`](https://github.com/dutifyai/dutify-cloud-ai-skill) — Project Management, Wiki, Feature Requests. PM API keys (`dk_live_…`).
 - **`dutify-hub-api` (this skill)** — Hub. Hub API keys (`dh_live_…`).
 
 The two skills are independent and use different keys; pick whichever matches the data the user wants to work with.

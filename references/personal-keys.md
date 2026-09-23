@@ -27,4 +27,4 @@ The server can revoke access at any time. Re-discover as needed; never retain po
 
 Keys created by a personal key inherit an expiry no later than their parent's. An omitted child expiry uses the parent's expiry; a later explicit expiry is rejected. Revoking a parent revokes its descendants. Key-management scopes remain in the full-permission default; read-only keys may list key metadata with `account:api-keys:read` but cannot mint or revoke keys.
 
-Calendar personal-key requests include the owner's unassigned events alongside events in the selected workspace. Events assigned to other workspaces remain inaccessible.
+Calendar events belong to the user’s account. Personal keys can list and manage the owner’s events across all workspace assignments, including unassigned events. An event’s workspace assignment supplies processing context; it does not determine event ownership or visibility. Calendar access still requires the relevant scopes and successful key authorization. Recordings remain subject to workspace access and opt-out checks.
