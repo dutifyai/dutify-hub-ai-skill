@@ -1,5 +1,10 @@
 # auth.md — Hub API key authentication
 
+## Account personal keys
+
+`du_live_…` keys work across Hub and the suite. Create/manage them in account settings. Discover workspaces and select one per request using `X-Dutify-Workspace`; see [personal-keys.md](personal-keys.md). The workspace-binding rules below describe existing `dh_live_…` workspace keys. For personal keys, the same boundary applies to the workspace selected for this request.
+
+
 Every Hub data-access call needs `X-API-Key: dh_live_<rest>`. Keys are issued from Hub UI → workspace → **API Keys** → Create.
 
 ## Key format
@@ -19,7 +24,7 @@ Each key is bound to **exactly one workspace** at creation. Hub's `ApiKeyScopeFi
 
 ## Scope catalog (11 scopes)
 
-Scopes are granted at key creation; you cannot add scopes to an existing key. The filter maps the request path's "resource" segment to a scope prefix and the HTTP method to `:read` or `:write`.
+Scopes are set at creation and may be edited by an authorized owner. The filter maps the request path's "resource" segment to a scope prefix and the HTTP method to `:read` or `:write`.
 
 | Scope | Powers |
 |---|---|
@@ -41,7 +46,7 @@ Defense-in-depth blocks at the path filter, regardless of scopes granted:
 
 - `/internal/*` — microservice-only endpoints
 - `/webhooks/*` — Composio + vendor inbound webhooks (signed differently, not API-key-auth)
-- `/v1/workspaces/{id}/api-keys/*` — creating/managing API keys (otherwise a leaked key could provision more keys for itself)
+- `/v1/workspaces/{id}/api-keys/*` — blocked for workspace keys. Personal keys require `hub:api-keys:read/write` and the user’s current management permission; they cannot grant broader scopes than their own.
 - `/user/credentials`, `/user/reset-password`, `/user/init` — account-takeover-class operations
 - `/v1/workspaces/{id}/integrations/{service}/oauth`, `/internal-connect`, `DELETE` — OAuth flows need interactive consent, JWT-only
 
