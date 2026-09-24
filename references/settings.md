@@ -138,7 +138,7 @@ Content-Type: application/json
 {"workspaceId": "<uuid>"}
 ```
 
-For an API-key caller, **the only `workspaceId` value Hub will accept is the key's bound workspace UUID** (or `null` to clear). Any other UUID returns:
+For workspace keys, Hub accepts the bound workspace UUID. For personal keys, it accepts the UUID selected through `X-Dutify-Workspace`. Both accept `null` to clear. Personal keys can clear a stale default without selecting a workspace; `hub:user-settings:write` is still required. Any other UUID returns:
 
 ```
 HTTP/1.1 403 Forbidden
@@ -150,7 +150,7 @@ HTTP/1.1 403 Forbidden
 
 Why: if a user has 3 workspaces (A, B, C) and an API key bound to A, that key MUST NOT be able to redirect the user's new events to B or C. The constraint is enforced at the resource layer (in addition to the path-allowlist done by `ApiKeyScopeFilter`).
 
-In practice, a script using an API key only ever wants to "set my default to THIS workspace" anyway — the key is bound to it.
+Select the intended workspace before setting a default with a personal key.
 
 ```python
 # Set default to the bound workspace
@@ -177,5 +177,5 @@ JWT callers (interactive Hub UI users) can set the default to any workspace they
 - **Treating "no prompt set" as an error** — there are two empty states and neither is a failure: **204 No Content** when a prompt was never set, and **200 with an empty body** once one has been cleared. The literal token `null` is never returned, so do not compare against it.
 - **Clearing with `null` or `""`** — both are stored verbatim as the prompt. Only an empty body clears it.
 - **Calling `.json()` on the read at all** — the response is plain text, so `.json()` raises for any prompt that isn't itself valid JSON, and again on the empty body of a cleared prompt. Use `r.text`.
-- **Trying to set defaultWorkspace to a different workspace's UUID** — always 403. Set to the bound workspace or null.
+- **Trying to set defaultWorkspace to a different workspace's UUID** — always 403. Set to the bound or selected workspace, or null.
 - **PUT-ing `{workspaceId: ""}`** — empty string isn't a valid UUID, returns 400. Use `null` (JSON null) to clear.

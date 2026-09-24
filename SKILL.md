@@ -1,20 +1,20 @@
 ---
 name: dutify-hub-api
-version: 2026.07.02
-description: Use the Dutify Hub HTTP API directly. Discover endpoints via the catalog at https://dutify.ai/api/v1/api-catalog, drill into a tag with /api-catalog/{tag} for full operation + schema detail, then call the endpoint with an X-API-Key header. Use this skill whenever the user wants to query, search, or act on Hub-side resources — call recordings, transcripts, summaries, signed audio/video URLs, workspace integrations, the workspace's custom AI prompt, the user's default workspace for events, sending call action items to Jira/ClickUp/Airtable, or asking Lens (programmatic chat) — even when they don't say "API" explicitly. Hub keys (dh_live_…) are NOT interchangeable with PM keys (dk_live_…); for PM/Wiki/Feature-Requests work, use the dutify-api skill instead.
+version: 2026.09.24
+description: Use the Dutify Hub HTTP API directly. Discover endpoints via the catalog at https://dutify.ai/api/v1/api-catalog, drill into a tag with /api-catalog/{tag} for full operation + schema detail, then call the endpoint with an X-API-Key header. Use this skill whenever the user wants to query, search, or act on Hub-side resources — call recordings, transcripts, summaries, signed audio/video URLs, workspace integrations, the workspace's custom AI prompt, the user's default workspace for events, sending call action items to Jira/ClickUp/Airtable, or asking Lens (programmatic chat) — even when they don't say "API" explicitly. Workspace Hub keys (dh_live_…) and suite keys (dk_live_…) are product-specific; account personal keys (du_live_…) work with both. For PM/Wiki/Feature-Requests work, use the dutify-api skill instead.
 ---
 
 # Dutify Hub API
 
-Direct HTTP access to **Dutify Hub** — workspace settings, integrations, members, call recordings + transcripts, the user's default workspace, and Lens chat — via the API-key surface (`dh_live_…`).
+Direct HTTP access to **Dutify Hub** — workspace settings, integrations, members, call recordings + transcripts, the user's default workspace, and Lens chat — via workspace keys (`dh_live_…`) or shared account personal keys (`du_live_…`).
 
-This is the **second** of two Dutify HTTP skills. The other one — `dutify-api` — covers Project Management, Wiki, and Feature Requests with PM keys (`dk_live_…`). They're independent products with separate keys; pick whichever matches the data the user wants.
+This is the **second** of two Dutify HTTP skills. The other one — `dutify-api` — covers Project Management, Wiki, and Feature Requests with PM keys (`dk_live_…`). Workspace keys are product-specific; one account personal key (`du_live_…`) works with both. Pick the skill matching the requested resources.
 
 ## Staying current
 
 This skill wraps a fast-moving API — **make sure you're on the latest before you rely on it.**
 
-- **Version:** `2026.07.02` — also in the frontmatter `version` and the root [`VERSION`](VERSION) file. Format is CalVer `YYYY.MM.DD`, with an optional `.N` suffix for a second release the same day.
+- **Version:** `2026.09.24` — also in the frontmatter `version` and the root [`VERSION`](VERSION) file. Format is CalVer `YYYY.MM.DD`, with an optional `.N` suffix for a second release the same day.
 - **Canonical source:** https://github.com/dutifyai/dutify-hub-ai-skill — the GitHub repo's `main` is the latest; this is the distribution copy.
 - **Check for a newer version before version-sensitive work:**
   - *Git clone:* `git -C <skill-dir> pull --ff-only` — or `git fetch` then compare `git rev-parse HEAD` against `git ls-remote origin HEAD`.
@@ -45,7 +45,7 @@ This SKILL.md covers the orientation. Each focused reference below is loaded on 
 
 | Reference | When to read |
 |---|---|
-| [auth.md](references/auth.md) | API-key header (`dh_live_…`), the 11 scopes, bound-workspace constraint, how to discover the bound workspace |
+| [auth.md](references/auth.md) | API-key headers, scopes, workspace boundaries, and discovery |
 | [errors.md](references/errors.md) | Hub error envelope shape, common codes (401/403/404/`WORKSPACE_OUT_OF_SCOPE`), what `validOptions` looks like when present |
 | [calls.md](references/calls.md) | `/usercall/...` — list, search, get, count, delete; integer ID vs UUID distinction; the `send_to_jira/clickup/airtable` "selection" endpoints with their per-vendor body shapes |
 | [recordings.md](references/recordings.md) | `/recording/...` — progress, reprocess, regenerate-summary, signed audio/media/preview URLs; expiry semantics; integer recording IDs |
@@ -65,7 +65,7 @@ Three steps for any task:
 
 1. **List tags** — `GET https://dutify.ai/api/v1/api-catalog`. Returns Hub's tags with descriptions and operation counts. Pick the tag closest to what the user wants.
 2. **Get tag detail** — `GET https://dutify.ai/api/v1/api-catalog/{tag}`. URL-encode tag names with spaces (`Workspace Settings` → `Workspace%20Settings`). Returns `{tag, description, service, baseUrl, operations[], schemas{}}` — operations have `method`, `path`, `summary`, `description`, `parameters`, `requestBody`, `responses`; schemas resolve `$ref` values.
-3. **Call the endpoint.** Send `X-API-Key: dh_live_…` and (for write endpoints) `Content-Type: application/json`.
+3. **Call the endpoint.** Send `X-API-Key: <key>` (and `X-Dutify-Workspace` for personal keys) and (for write endpoints) `Content-Type: application/json`.
 
 There's also `GET /api-catalog/detailed` if you want the full thing in one shot, but it's larger — prefer the per-tag endpoint when you know which tag.
 
@@ -92,13 +92,9 @@ User-level settings (`get/set_default_workspace`) live under `Workspaces` in the
 
 ## Auth model — quick
 
-Every data-access call needs `X-API-Key: dh_live_<rest>`. Keys are **workspace-bound** (one key, one workspace) and **scope-gated** (per resource family — see `auth.md`). Hub's `ApiKeyScopeFilter` rejects:
+Send `X-API-Key` on data requests. Existing `dh_live_…` workspace keys remain bound to one workspace. Account personal keys (`du_live_…`) work with both Hub and the suite and inherit the user's current permissions, narrowed by key scopes and workspace policy.
 
-- Path-workspace mismatches (`/v1/workspaces/{id}/...` where `{id}` ≠ the key's bound workspace)
-- Endpoints not on the API-key allowlist (e.g. anything under `/internal`, `/webhooks`, OAuth flows, `/user/credentials`, `/user/reset-password`)
-- Calls without the right scope (returns the required scope in the error message)
-
-Full table of scopes + auth failure modes in [auth.md](references/auth.md).
+For a personal key, first discover accessible workspaces with `GET https://dutify.ai/api/v1/personal-api-keys/workspaces`, without a workspace header. Set `X-Dutify-Workspace` to the selected canonical UUID (`id`) on each data request. Resolve ambiguity before writes; never guess a workspace or silently fall back to a different one after denial. Read [personal-keys.md](references/personal-keys.md) for discovery, scopes, limits, and account management. Read [auth.md](references/auth.md) for existing workspace-key behavior.
 
 ## Hub vs Lite-API conventions (different from PM)
 
@@ -123,9 +119,11 @@ Pseudocode that works in any language with an HTTP client. **Don't trust the fie
 import requests, urllib.parse, os
 
 API_KEY = os.environ["DUTIFY_HUB_API_KEY"]
-WORKSPACE_ID = os.environ["DUTIFY_HUB_WORKSPACE_ID"]   # the UUID this key is bound to
+WORKSPACE_ID = os.environ["DUTIFY_HUB_WORKSPACE_ID"]   # selected canonical workspace UUID
 CATALOG = "https://dutify.ai/api/v1/api-catalog"
 HEADERS = {"X-API-Key": API_KEY}
+if API_KEY.startswith("du_live_"):
+    HEADERS["X-Dutify-Workspace"] = WORKSPACE_ID
 
 # 1. (optional) Discover the right tag
 tags = requests.get(CATALOG).json()

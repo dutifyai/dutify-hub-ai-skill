@@ -8,15 +8,17 @@ GET /api/v1/workspaces
 
 Scope: `workspaces:read`.
 
-For an API-key caller, the response is filtered to **only the workspace this key is bound to**. Even if the actor user is a member of multiple workspaces, only the bound one comes back. This is the simplest way to discover the bound workspace UUID from a stored key:
+For a workspace-key (`dh_live_…`) caller, the response is filtered to **only the workspace this key is bound to**. Even if the actor user is a member of multiple workspaces, only the bound one comes back. This is the simplest way to discover the bound workspace UUID from a stored key:
 
 ```python
 ws = requests.get(
     "https://dutify.ai/api/v1/workspaces",
     headers={"X-API-Key": key},
 ).json()["workspaces"]
-bound_uuid = ws[0]["id"]   # always exactly one entry for API-key callers
+bound_uuid = ws[0]["id"]   # workspace keys return their bound workspace
 ```
+
+Personal keys (`du_live_…`) discover eligible workspaces with `GET /api/v1/personal-api-keys/workspaces` without a selection header. Choose a workspace with `hubAccess: true`, then send its canonical UUID in `X-Dutify-Workspace` on workspace requests. The regular workspace listing is restricted to that selection.
 
 For JWT callers (interactive Hub UI), the response includes every workspace the user belongs to.
 

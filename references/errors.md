@@ -25,7 +25,7 @@ Bean-validation failures (e.g. missing required fields) return RestEasy's defaul
 | Status | Meaning | Typical fix |
 |---|---|---|
 | 400 | Bad request — malformed body, validation failure, missing query param | Read the message; fix the input |
-| 401 | API key missing or wrong format (must start with `dh_live_`), or key revoked | Reissue a key from Hub UI |
+| 401 | API key missing or wrong format (supports `dh_live_` workspace keys and `du_live_` personal keys), or key revoked | Check expiry/revocation; reissue from workspace or account settings as appropriate |
 | 403 | Scope or workspace boundary violation | See [auth.md](auth.md) — message tells you which |
 | 404 | Endpoint not exposed to API keys, or referenced resource doesn't exist | If "Endpoint is not exposed to API keys" — the path isn't in the API-key allowlist; this can't be fixed without provisioning a different scope/auth |
 | 409 | Conflict (rare on Hub — mostly for DB unique-constraint conflicts) | Body usually has actionable detail |
@@ -69,3 +69,15 @@ These don't error — they return 2xx but with empty/null payloads:
 - `GET /usercall/search?query=` with no matching results returns `[]`, not 404.
 - `GET /usercall/{id}` for a deleted call returns 404, not 200 with `{deleted: true}` — check status, not body.
 - `POST /usercall/selection/jira` returns the boolean `true` on success, `false` on a soft failure (e.g. integration tokens were valid at scope-check time but expired by the time the actual Jira API was called). Surface false to the user as "couldn't push" — don't treat it as success.
+
+### Personal-key denials
+
+Personal-key authentication uses a flat `{code, message}` response. Check the status and code before suggesting a different key.
+
+| Status | Code | Action |
+| --- | --- | --- |
+| 400 | `WORKSPACE_REQUIRED` | Discover accessible workspaces and send the selected canonical identifier in `X-Dutify-Workspace`. The key format is valid. |
+| 401 | authentication failure | Check for a missing, invalid, expired, or revoked key, including a revoked or expired delegating parent. Both the product's workspace-key prefix and `du_live_` are supported. |
+| 402 | `PERSONAL_API_KEY_LIMIT_REACHED` | Workspace keys have priority. Ask an administrator to upgrade capacity or disable personal-key access in workspace Security settings; do not switch workspaces to bypass the limit. |
+| 403 | `PERSONAL_API_KEYS_DISABLED` / `PERSONAL_API_KEY_ACCESS_DENIED` / `ACCESS_DENIED` | Check workspace opt-out, current membership, product access, selected workspace, and scopes. Retry only after the relevant condition changes. Downstream products may normalize the code to `PERSONAL_API_KEY_ACCESS_DENIED`. |
+| 503 | `PERSONAL_API_KEY_AUTHORITY_UNAVAILABLE` | Authorization could not reach its authority. Retry a read with bounded backoff; report a persistent outage. Never substitute cached authorization or repeat a mutation whose outcome is unknown. |
