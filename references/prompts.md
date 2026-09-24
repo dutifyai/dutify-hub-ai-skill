@@ -139,8 +139,8 @@ PUT /api/v1/calendar/series/{seriesMasterId}/custom-prompt
 ```
 
 `workspaceId` is optional and only consulted when the row must be created. It
-provides processing context, not ownership. Personal keys may choose that context
-for any of the user's own series. Workspace keys remain restricted to their bound
+provides processing context, not ownership. Personal keys may choose a workspace the user belongs to and which permits that
+key, for any of the user's own series. Workspace keys remain restricted to their bound
 workspace or the actor's own default; any other choice is refused with 403.
 
 Two cases still answer 404: a series with no synced occurrences, and one where
