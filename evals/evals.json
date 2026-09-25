@@ -30,6 +30,24 @@
       "name": "workspace-reference-fields",
       "prompt": "My dw_live_ metadata from PM has workspaceUuid UUID-A and workspaceIdentifier ws_A, and grants for Suite and Hub. Show the context for a Hub call and PM task in that workspace; do not use another workspace or execute writes.",
       "files": []
+    },
+    {
+      "id": 5,
+      "name": "qualified-catalog-outage",
+      "prompt": "The version 1 catalog reports Hub unavailable and PM available. I need to read a Hub recording. Explain what you can do without falling back to another catalog or claiming the recording is absent.",
+      "files": []
+    },
+    {
+      "id": 6,
+      "name": "explicit-rotation-cutover",
+      "prompt": "Rotate my unified workspace integration key. There are no spare quota slots and I have not said when clients can switch. Explain the choices before any write; preserve the actor, grants, restrictions and expiry.",
+      "files": []
+    },
+    {
+      "id": 7,
+      "name": "issuer-identity",
+      "prompt": "The workspace API key page contains a Suite-only key and a Hub-only key with the same ID. I asked to revoke only the Hub key, and the Suite list is unavailable. Explain the target and how to report a successful revoke followed by a refresh failure.",
+      "files": []
     }
   ]
 }
