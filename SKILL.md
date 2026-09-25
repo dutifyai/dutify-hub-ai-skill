@@ -6,7 +6,7 @@ description: Use the Dutify Hub HTTP API directly. Discover endpoints via the ca
 
 # Dutify Hub API
 
-For a `dw_live_` workspace integration key, read [integration keys](references/integration-keys.md) first. Verify deployed contract v1; it uses explicit Hub grants and current named-member permissions in one workspace. Issuance may still be disabled. Calendar/account preferences and credential administration are unavailable to this type.
+For a `dw_live_` workspace integration key, read [integration keys](references/integration-keys.md) first. Verify deployed contract v1; it uses explicit Hub grants and current named-member permissions in one workspace. Issuance is available when contract v1 is deployed. Calendar/account preferences and credential administration are unavailable to this type.
 
 Direct HTTP access to **Dutify Hub** — workspace settings, integrations, members, call recordings + transcripts, the user's default workspace, and Lens chat — via workspace keys (`dh_live_…`) or shared account personal keys (`du_live_…`).
 

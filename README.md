@@ -11,7 +11,7 @@ The two supported installation choices are:
 - [`dutify-api`](https://github.com/dutifyai/dutify-cloud-ai-skill) — Hub, Project Management, Wiki and Feature Requests.
 - **`dutify-hub-api` (this skill)** — standalone Hub guidance for existing installations.
 
-Both remain independently usable. Legacy keys retain product limits; personal keys can span products. New `dw_live_` workspace keys require deployed contract v1 and explicit grants; see [integration keys](references/integration-keys.md). Updating the skill does not enable key issuance.
+Both remain independently usable. Legacy keys retain product limits; personal keys can span products. New `dw_live_` workspace keys require deployed contract v1 and explicit grants; see [integration keys](references/integration-keys.md). Updating the skill does not deploy the authority; issuance is available when that authority is deployed.
 
 ## Install
 

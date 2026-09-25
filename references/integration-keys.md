@@ -12,7 +12,7 @@ These keys cannot access account-owned calendars, calendar subscriptions/prompts
 
 The additive namespace is `/mp/api/v1/workspaces/{identifier}/integration-api-keys`. `/capabilities` reports `contractVersion`, `issuanceEnabled`, `actorMode`, and `delegation`. Version 1 requires an interactive user token (`delegation: false`); personal API keys cannot mint these keys. Do not call internal validators or request service secrets.
 
-When management is requested and interactive authentication is available, inspect capabilities and the deployed catalog. `issuanceEnabled: false` means creation is unavailable. Report it; do not toggle production configuration or retry through a legacy issuer. Unsupported versions may need a supported workflow; 401/403 and outages do not authorize fallback.
+When management is requested and interactive authentication is available, inspect capabilities and the deployed catalog. Contract v1 reports `issuanceEnabled: true` and needs no activation flag. A missing or unsupported contract means this workflow is not deployed; report that rather than retrying through a legacy issuer. Unsupported versions may need a supported workflow; 401/403 and outages do not authorize fallback.
 
 When enabled, POST accepts `name`, concrete `scopes`, optional future `expiresAt`, and Suite `resourceAccess`, returning `rawKey` once. Lists omit secrets/hashes. PUT edits metadata/grants; DELETE revokes. Actor/workspace are immutable, and management requires permission for every granted product. A multi-product key consumes one PM API-key slot, with priority over personal-key slots. Legacy Hub quota remains separate. Creating a replacement never implies revoking the old key.
 

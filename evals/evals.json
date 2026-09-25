@@ -21,8 +21,8 @@
     },
     {
       "id": 3,
-      "name": "issuance-disabled",
-      "prompt": "Create a unified workspace key using my personal du_live_ credential. The deployed capabilities report contractVersion 1, issuanceEnabled false and delegation false. Explain the available next step without changing production settings or using a legacy issuer.",
+      "name": "interactive-issuance",
+      "prompt": "Create a unified workspace key using my personal du_live_ credential. The deployed capabilities report contractVersion 1, issuanceEnabled true and delegation false. Explain the available next step without switching to a legacy issuer or assuming my API key is an interactive sign-in.",
       "files": []
     },
     {
