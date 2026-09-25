@@ -1,10 +1,12 @@
 ---
 name: dutify-hub-api
-version: 2026.09.25
+version: 2026.09.25.1
 description: Use the Dutify Hub HTTP API directly. Discover endpoints via the catalog at https://dutify.ai/api/v1/api-catalog, drill into a tag with /api-catalog/{tag} for full operation + schema detail, then call the endpoint with an X-API-Key header. Use this skill whenever the user wants to query, search, or act on Hub-side resources — call recordings, transcripts, summaries, signed audio/video URLs, workspace integrations, the workspace's custom AI prompt, the user's default workspace for events, sending call action items to Jira/ClickUp/Airtable, or asking Lens (programmatic chat) — even when they don't say "API" explicitly. Workspace Hub keys (dh_live_…) and suite keys (dk_live_…) are product-specific; account personal keys (du_live_…) work with both. For PM/Wiki/Feature-Requests work, use the dutify-api skill instead.
 ---
 
 # Dutify Hub API
+
+For a `dw_live_` workspace integration key, read [integration keys](references/integration-keys.md) first. Verify deployed contract v1; it uses explicit Hub grants and current named-member permissions in one workspace. Issuance may still be disabled. Calendar/account preferences and credential administration are unavailable to this type.
 
 Direct HTTP access to **Dutify Hub** — workspace settings, integrations, members, call recordings + transcripts, the user's default workspace, and Lens chat — via workspace keys (`dh_live_…`) or shared account personal keys (`du_live_…`).
 
@@ -16,8 +18,8 @@ For MCP setup and compatibility, read [connector guidance](references/connector.
 
 This skill wraps a fast-moving API — **make sure you're on the latest before you rely on it.**
 
-- **Version:** `2026.09.25` — also in the frontmatter `version` and the root [`VERSION`](VERSION) file. Format is CalVer `YYYY.MM.DD`, with an optional `.N` suffix for a second release the same day.
-- **Canonical source:** https://github.com/dutifyai/dutify-hub-ai-skill — the GitHub repo's `main` is the latest; this is the distribution copy.
+- **Version:** `2026.09.25.1` — also in the frontmatter `version` and the root [`VERSION`](VERSION) file. Format is CalVer `YYYY.MM.DD`, with an optional `.N` suffix for a second release the same day.
+- **Canonical source:** https://github.com/dutifyai/dutify-hub-ai-skill — the GitHub repo's `master` is the latest; this is the distribution copy.
 - **Check for a newer version before version-sensitive work:**
   - *Git clone:* `git -C <skill-dir> pull --ff-only` — or `git fetch` then compare `git rev-parse HEAD` against `git ls-remote origin HEAD`.
   - *Flat install (no git):* compare your local `VERSION` to the repo's, then re-pull/reinstall if it's newer —

@@ -8,10 +8,10 @@ Covers the Hub API surface in one skill: workspace settings, integrations, membe
 
 The two supported installation choices are:
 
-- [`dutify-api`](https://github.com/dutifyai/dutify-cloud-ai-skill) — Project Management, Wiki, Feature Requests. PM API keys (`dk_live_…`).
-- **`dutify-hub-api` (this skill)** — Hub. Hub API keys (`dh_live_…`).
+- [`dutify-api`](https://github.com/dutifyai/dutify-cloud-ai-skill) — Hub, Project Management, Wiki and Feature Requests.
+- **`dutify-hub-api` (this skill)** — standalone Hub guidance for existing installations.
 
-The two skills are independent and use different keys; pick whichever matches the data the user wants to work with.
+Both remain independently usable. Legacy keys retain product limits; personal keys can span products. New `dw_live_` workspace keys require deployed contract v1 and explicit grants; see [integration keys](references/integration-keys.md). Updating the skill does not enable key issuance.
 
 ## Install
 
