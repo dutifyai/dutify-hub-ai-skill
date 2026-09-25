@@ -1,0 +1,17 @@
+{
+  "skill_name": "dutify-hub-api",
+  "evals": [
+    {
+      "id": 0,
+      "name": "standalone-hub",
+      "prompt": "Only this Hub skill is installed. Use my dh_live_ credential to show the HTTP request for my bound workspace calls. Do not install or read another skill.",
+      "files": []
+    },
+    {
+      "id": 1,
+      "name": "old-hub-mcp",
+      "prompt": "My connection is mcp-hub.dutify.ai/mcp. Show the existing call-list tool and explain whether I need to change anything after the unified connector release.",
+      "files": []
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 ---
 name: dutify-hub-api
-version: 2026.09.24
+version: 2026.09.25
 description: Use the Dutify Hub HTTP API directly. Discover endpoints via the catalog at https://dutify.ai/api/v1/api-catalog, drill into a tag with /api-catalog/{tag} for full operation + schema detail, then call the endpoint with an X-API-Key header. Use this skill whenever the user wants to query, search, or act on Hub-side resources — call recordings, transcripts, summaries, signed audio/video URLs, workspace integrations, the workspace's custom AI prompt, the user's default workspace for events, sending call action items to Jira/ClickUp/Airtable, or asking Lens (programmatic chat) — even when they don't say "API" explicitly. Workspace Hub keys (dh_live_…) and suite keys (dk_live_…) are product-specific; account personal keys (du_live_…) work with both. For PM/Wiki/Feature-Requests work, use the dutify-api skill instead.
 ---
 
@@ -8,13 +8,15 @@ description: Use the Dutify Hub HTTP API directly. Discover endpoints via the ca
 
 Direct HTTP access to **Dutify Hub** — workspace settings, integrations, members, call recordings + transcripts, the user's default workspace, and Lens chat — via workspace keys (`dh_live_…`) or shared account personal keys (`du_live_…`).
 
-This is the **second** of two Dutify HTTP skills. The other one — `dutify-api` — covers Project Management, Wiki, and Feature Requests with PM keys (`dk_live_…`). Workspace keys are product-specific; one account personal key (`du_live_…`) works with both. Pick the skill matching the requested resources.
+This remains a self-contained Hub skill for existing installations. The `dutify-api` skill now covers Hub, PM, Wiki, and Roadmarq together; installing it is optional for Hub work. Existing `dh_live_` and `dk_live_` workspace credentials remain product-specific, while `du_live_` personal credentials work across granted products.
+
+For MCP setup and compatibility, read [connector guidance](references/connector.md). The new `/unified` connector route is released separately; verify its tool list before configuring it. Existing connector URLs and Hub tool names continue to work. These HTTP instructions do not depend on MCP.
 
 ## Staying current
 
 This skill wraps a fast-moving API — **make sure you're on the latest before you rely on it.**
 
-- **Version:** `2026.09.24` — also in the frontmatter `version` and the root [`VERSION`](VERSION) file. Format is CalVer `YYYY.MM.DD`, with an optional `.N` suffix for a second release the same day.
+- **Version:** `2026.09.25` — also in the frontmatter `version` and the root [`VERSION`](VERSION) file. Format is CalVer `YYYY.MM.DD`, with an optional `.N` suffix for a second release the same day.
 - **Canonical source:** https://github.com/dutifyai/dutify-hub-ai-skill — the GitHub repo's `main` is the latest; this is the distribution copy.
 - **Check for a newer version before version-sensitive work:**
   - *Git clone:* `git -C <skill-dir> pull --ff-only` — or `git fetch` then compare `git rev-parse HEAD` against `git ls-remote origin HEAD`.
