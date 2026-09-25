@@ -1,10 +1,12 @@
+> This Hub distribution remains independently usable. The `dutify-api` skill now covers all products. Existing Hub MCP URLs and tool names remain supported; see [connector compatibility](references/connector.md) before adopting the separately released unified endpoint.
+
 # dutify-hub-api — Claude Code skill
 
 A Claude Code (and Claude.ai) skill that teaches an LLM how to use the **Dutify Hub** HTTP API directly: discover endpoints via the catalog at `https://dutify.ai/api/v1/api-catalog`, call the right tag with an `X-API-Key`, and self-correct on structured errors instead of guessing endpoint shapes from memory.
 
 Covers the Hub API surface in one skill: workspace settings, integrations, members, call recordings + transcripts, the user's default workspace for events, and Lens chat.
 
-This is the **second** of two Dutify HTTP skills:
+The two supported installation choices are:
 
 - [`dutify-api`](https://github.com/dutifyai/dutify-cloud-ai-skill) — Project Management, Wiki, Feature Requests. PM API keys (`dk_live_…`).
 - **`dutify-hub-api` (this skill)** — Hub. Hub API keys (`dh_live_…`).
@@ -40,7 +42,7 @@ Then in any Claude Code session, ask "what's the URL for downloading the audio o
 
 ## How the skill is laid out
 
-`SKILL.md` is the orientation file an LLM always sees; the 9 reference files in `references/` are loaded on-demand based on the topic map.
+`SKILL.md` is the orientation file an LLM always sees; the focused reference files in `references/` are loaded on-demand based on the topic map.
 
 | File | Topic |
 |---|---|
