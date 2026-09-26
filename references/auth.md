@@ -1,11 +1,15 @@
 # auth.md — Hub API key authentication
 
+## Workspace integration keys
+
+For `dw_live_`, read [integration keys](integration-keys.md) first. Deployed contract v1 supports fixed-workspace Hub grants with current named-member permissions. Account-owned calendar and preference operations in the legacy scope table below do not apply to this type. Creation may still be disabled, and management is interactive-only.
+
 ## Account personal keys
 
 `du_live_…` keys work across Hub and the suite. Create/manage them in account settings. Discover workspaces and select one per request using `X-Dutify-Workspace`; see [personal-keys.md](personal-keys.md). The workspace-binding rules below describe existing `dh_live_…` workspace keys. For personal keys, workspace resources follow the workspace selected for this request. Calendar events remain account-owned across processing-workspace assignments; see [prompts.md](prompts.md).
 
 
-Every Hub data-access call needs `X-API-Key` with either a `dh_live_…` workspace key or a `du_live_…` account personal key. Workspace keys are issued from Hub workspace settings → **API Keys**; personal keys from account settings.
+Hub data calls use `X-API-Key`: legacy `dh_live_`, personal `du_live_`, or `dw_live_` when deployed support and Hub grants are present. Legacy Hub keys are issued from Hub workspace settings → **API Keys**; personal keys from account settings.
 
 ## Key format
 
@@ -54,7 +58,7 @@ Defense-in-depth blocks at the path filter, regardless of scopes granted:
 
 | Code | Status | Meaning |
 |---|---|---|
-| 401 | Missing `X-API-Key` header, or value starts with neither `dh_live_` nor `du_live_`, or key revoked / not found |
+| 401 | Missing/invalid/revoked credential, or its credential family is not supported by the deployed backend |
 | 403 | "Insufficient scope. Required: <scope>" — your key doesn't have the scope this endpoint needs |
 | 403 | "API key cannot access this workspace" — path workspace doesn't match the key's bound workspace |
 | 403 | "API keys cannot manage other API keys" — you tried to hit `/v1/workspaces/{id}/api-keys/...` |
