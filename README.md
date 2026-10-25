@@ -2,6 +2,8 @@
 
 # dutify-hub-api — Claude Code skill
 
+<img src="demo.gif" width="400" alt="Dutify Hub takes the notes on a call nobody else wrote down">
+
 A Claude Code (and Claude.ai) skill that teaches an LLM how to use the **Dutify Hub** HTTP API directly: discover endpoints via the catalog at `https://dutify.ai/api/v1/api-catalog`, call the right tag with an `X-API-Key`, and self-correct on structured errors instead of guessing endpoint shapes from memory.
 
 Covers the Hub API surface in one skill: workspace settings, integrations, members, call recordings + transcripts, the user's default workspace for events, and Lens chat.
